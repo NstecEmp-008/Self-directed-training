@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.training.ec.repository.StockRepository">
+
+    <!-- Stockエンティティに結果をマッピングする設計図 -->
+    <resultMap id="stockResultMap" type="com.training.ec.entity.Stock">
+        <id property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="stockId" column="stockId"/>
+        <result property="quantity" column="quantity"/>
+        <result property="symbol" column="symbol"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="changePercentage" column="change_percentage"/>
+        <result property="lastUpdated" column="last_updated"/>
+    </resultMap>
+
+    <!-- すべての銘柄を取得 -->
+    <select id="findAll" resultMap="stockResultMap">
+        SELECT id, symbol, name, price, change_percentage, last_updated
+        FROM stock
+    </select>
+
+    <!-- IDで特定の銘柄を検索 -->
+    <select id="findById" resultMap="stockResultMap" parameterType="Long">
+        SELECT id, symbol, name, price, change_percentage, last_updated
+        FROM stock
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 新しい銘柄を保存 -->
+    <insert id="save" parameterType="com.training.ec.entity.Stock" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stock (symbol, name, price, change_percentage, last_updated)
+        VALUES (#{symbol}, #{name}, #{price}, #{changePercentage}, #{lastUpdated})
+    </insert>
+
+    <!-- IDで銘柄を削除 -->
+    <delete id="deleteById" parameterType="Long">
+        DELETE FROM stock WHERE id = #{id}
+    </delete>
+
+    <!-- 検索条件に一致する銘柄を取得するクエリを追加 -->
+<!-- 修正箇所: 検索機能を追加し、symbolとnameで部分一致検索を行う -->
+<!-- 処理内容: クライアントから受け取ったsearchTermを使い、大文字・小文字を区別しない`ILIKE`演算子で検索する -->
+<!-- `where`タグは、内側の<if>条件が真の場合に`WHERE`キーワードを自動で追加します。 -->
+<select id="findBySearchTerm" parameterType="java.lang.String" resultMap="stockResultMap">
+    SELECT id, symbol, name, price, change_percentage, last_updated
+    FROM stock
+    <where>
+        <if test="searchTerm != null and searchTerm != ''">
+            symbol ILIKE '%' || #{searchTerm} || '%'
+            OR name ILIKE '%' || #{searchTerm} || '%'
+        </if>
+    </where>
+    ORDER BY symbol
+</select>
+
+    <!-- 株価更新用のクエリを追加 -->
+<update id="updateStockPrice" parameterType="com.training.ec.entity.Stock">
+    UPDATE stock
+    SET price = #{price},
+        last_updated = #{lastUpdated},
+        change_percentage = #{changePercentage}
+    WHERE id = #{id}
+</update>
+
+<!-- UserStockMapper.xml
+<select id="findByUserId" resultType="com.training.ec.entity.UserStock">
+    SELECT us.id,
+           us.user_id AS userId,
+           us.stock_id AS stockId,
+           us.quantity,
+           s.symbol,
+           s.name,
+           s.price,
+           s.last_updated AS lastUpdated
+    FROM user_stock us
+    JOIN stock s ON us.stock_id = s.id
+    WHERE us.user_id = #{userId}
+</select>
+
+<! UserStockMapper.xml -->
+<!-- <select id="findByUserId" resultType="com.training.ec.entity.UserStock">
+    SELECT 
+        us.id AS id,
+        us.user_id AS userId,
+        us.stock_id AS stockId,
+        us.quantity AS quantity,
+        s.symbol AS symbol,
+        s.name AS name,
+        s.price AS price,
+        s.last_updated AS lastUpdated
+    FROM user_stock us
+    JOIN stock s ON us.stock_id = s.id
+    WHERE us.user_id = #{userId}
+</select> -->
+ 
+
+
+    
+</mapper>

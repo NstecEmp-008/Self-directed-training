@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>銘柄一覧</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>銘柄一覧</h1>
+        <div class="action-bar">
+            <!-- ボタンと検索フォームをFlexboxコンテナ内に配置 -->
+            <div>
+                <a th:href="@{/user/user}" class="add-stock-btn">メニューへ戻る</a>
+            </div>
+
+            <div>
+                <a th:href="@{/user/stock/portfolio}" class="add-stock-btn">保有株一覧</a>
+            </div>
+
+            <!-- 検索フォーム -->
+            <form th:action="@{/user/stocks}" method="get" class="search-form">
+                <input type="text" name="searchTerm" placeholder="銘柄コードまたは銘柄名で検索" th:value="${searchTerm}">
+                <button type="submit">検索</button>
+            </form>
+        </div>
+        <!--  -->
+        <!-- <div class="chart-container" style="width:80%; margin:20px auto;">
+            <canvas id="portfolioChart"></canvas>
+        </div> -->
+
+        <table>
+            <thead>
+                <tr>
+
+                    <th>銘柄コード</th>
+                    <th>銘柄名</th>
+                    <th>現在価格</th>
+                    <th>前日比（%）</th>
+                    <th>最終更新日時</th>
+                    <th class="text-center">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ここでデータベースから取得した銘柄リストをループ処理しています -->
+                <tr th:each="stock : ${stocks}" th:id="'stock-' + ${stock.id}">
+                    <!-- <td th:text="${stock.id}">1</td> -->
+                    <td th:text="${stock.symbol}">AAPL</td>
+                    <td th:text="${stock.name}">Apple Inc.</td>
+                    <td class="price" th:text="${#numbers.formatDecimal(stock.price, 0, 'POINT', 2, 'COMMA')}">150.00
+                    </td>
+                    <td class="change"
+                        th:text="${#numbers.formatDecimal(stock.changePercentage, 0, 'POINT', 2, 'COMMA')}">1.50</td>
+
+                    <td class="lastUpdated" th:text="${#temporals.format(stock.lastUpdated, 'yyyy/MM/dd HH:mm:ss')}">
+                        2023/10/26
+                        10:00:00
+                    </td>
+                    <td class="text-center">
+                        <!-- 購入ページに遷移 -->
+                        <a th:href="@{/user/stock/buy/{id}(id=${stock.id})}" class="action-link">購入</a>
+                         
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- SockJS / STOMP ライブラリ -->
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+        <script>
+            // ✅ サーバー側のエンドポイントに接続（SockJS 経由）
+            const socket = new SockJS('/ws');
+            const stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function () {
+                console.log("✅ WebSocket 接続成功");
+
+                // ✅ サーバー側が送信する /topic/stocks を購読
+                stompClient.subscribe('/topic/stocks', function (message) {
+                    const stocks = JSON.parse(message.body);
+
+                    // 配列として送られてくる想定
+                    stocks.forEach(stock => {
+                        const row = document.querySelector("#stock-" + stock.id);
+                        if (row) {
+                            // 現在価格を更新
+                            row.querySelector(".price").textContent = stock.price.toFixed(2);
+
+                            // 変動率を更新
+                            row.querySelector(".change").textContent = stock.changePercentage.toFixed(2) + "%";
+
+                            // ✅ 更新日時を「現在時刻」で表示
+                            const now = new Date();
+                            row.querySelector(".lastUpdated").textContent =
+                                now.toLocaleString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+                        }
+                    });
+                });
+            });
+        </script>
+
+    </div>
+</body>
+
+</html>

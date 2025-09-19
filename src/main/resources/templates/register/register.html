@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ユーザー登録</title>
+    <!-- Bootstrap 読み込み -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .register-card {
+            max-width: 450px;
+            margin: 80px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+        .register-card .card-header {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .form-label {
+            font-weight: 600;
+        }
+        .error-text {
+            color: red;
+            font-size: 0.9rem;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .login-link a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card register-card">
+            <div class="card-header">
+                <h3 class="mb-0">ユーザー登録</h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/register}" th:object="${userRegistrerform}" method="post">
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">ユーザー名</label>
+                        <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="ユーザー名を入力">
+                        <div th:if="${#fields.hasErrors('username')}" class="error-text" th:errors="*{username}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">パスワード</label>
+                        <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="パスワードを入力">
+                        <div th:if="${#fields.hasErrors('password')}" class="error-text" th:errors="*{password}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">パスワード確認</label>
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" placeholder="もう一度入力してください">
+                        <div th:if="${#fields.hasErrors('confirmPassword')}" class="error-text" th:errors="*{confirmPassword}"></div>
+                    </div>
+
+                    <div th:if="${errorMessage}" class="alert alert-danger py-2 text-center" th:text="${errorMessage}"></div>
+
+                    <button type="submit" class="btn btn-primary w-100">登録</button>
+                    <input type="hidden" name="_csrf" value="5e5f0472-c675-43ad-be0a-d673a0325db4" />
+                </form>
+
+                <!-- 🔵 ログイン画面へ戻るリンク -->
+                <div class="login-link">
+                    <p>すでにアカウントをお持ちの方は <a th:href="@{/admin/login}">ログイン</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.training.ec.repository.UserStockRepository">
+
+    <select id="findByUserId" resultType="com.training.ec.entity.UserStock">
+        SELECT 
+            us.id AS id,
+            us.user_id AS userId,
+            us.stock_id AS stockId,
+            us.quantity AS quantity,
+            s.symbol AS symbol,
+            s.name AS name,
+            s.price AS price,
+            s.last_updated AS lastUpdated
+        FROM user_stock us
+        JOIN stock s ON us.stock_id = s.id
+        WHERE us.user_id = #{userId}
+    </select>
+
+    <select id="findByUserIdAndStockId" resultType="com.training.ec.entity.UserStock">
+        SELECT * FROM user_stock
+        WHERE user_id = #{userId} AND stock_id = #{stockId}
+    </select>
+
+    <insert id="insert" parameterType="com.training.ec.entity.UserStock" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_stock (user_id, stock_id, quantity)
+        VALUES (#{userId}, #{stockId}, #{quantity})
+    </insert>
+
+    <update id="update" parameterType="com.training.ec.entity.UserStock">
+        UPDATE user_stock
+        SET quantity = #{quantity}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM user_stock WHERE id = #{id}
+    </delete>
+
+</mapper>

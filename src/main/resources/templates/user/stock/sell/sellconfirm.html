@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>株式売却確認</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white p-8 rounded-2xl shadow-lg max-w-lg w-full space-y-6">
+    <!-- タイトル -->
+    <h2 class="text-2xl font-bold text-gray-800 text-center">株式売却確認</h2>
+    <p class="text-gray-600 text-center">以下の内容で売却します。よろしいですか？</p>
+
+    <!-- 株式情報カード -->
+    <div class="bg-gray-50 p-6 rounded-lg shadow-inner space-y-3">
+      <p><span class="font-semibold text-gray-700">銘柄コード:</span> <span th:text="${userStock.symbol}"></span></p>
+      <p><span class="font-semibold text-gray-700">銘柄名:</span> <span th:text="${userStock.name}"></span></p>
+      <p><span class="font-semibold text-gray-700">参考価格:</span> <span th:text="${userStock.price}"></span> 円</p>
+      <p><span class="font-semibold text-gray-700">保有数:</span> <span th:text="${userStock.quantity}"></span> 株</p>
+      <p><span class="font-semibold text-gray-700">売却数:</span> <span th:text="${quantity}"></span> 株</p>
+      <p class="text-lg font-bold text-red-600"><span class="font-semibold">売却金額:</span> <span th:text="${totalPrice}"></span> 円</p>
+    </div>
+
+    <!-- アクションボタン -->
+    <div class="flex justify-between gap-4 pt-4">
+      <!-- 戻る -->
+      <form th:action="@{/user/stock/portfolio}" method="get" class="w-1/2">
+        <button type="submit"
+          class="w-full py-3 rounded-lg bg-gray-200 text-gray-700 font-bold shadow hover:bg-gray-300 transition">
+          戻る
+        </button>
+      </form>
+
+      <!-- 売却実行 -->
+      <form th:action="@{/user/stock/sell/execute}" method="post" class="w-1/2">
+        <input type="hidden" name="stockId" th:value="${userStock.stockId}" />
+        <input type="hidden" name="quantity" th:value="${quantity}" />
+        <button type="submit"
+          class="w-full py-3 rounded-lg bg-red-600 text-white font-bold shadow hover:bg-red-700 transition">
+          売却する
+        </button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

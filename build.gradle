@@ -1,0 +1,76 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.4'
+	// '1.1.4'元々のやつ
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Spring Boot やSpring Frameworkの基本機能
+	implementation 'org.springframework.boot:spring-boot-starter'
+	// Spring Test機能を利用するための記述
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// JUnit 5を利用するための記述
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// Lombokの依存関係を追加
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+	// MyBatisの依存関係を追加
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
+    // JDBCの依存関係を追加
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    // PostgreSQLの依存関係を追加
+    runtimeOnly 'org.postgresql:postgresql'
+	// Spring MVCの依存関係を追加
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Thymeleafの依存関係を追加
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // devtoolsの依存関係を追加
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // Actuatorの依存関係を追加
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// 追加要素
+	// バリデーション
+  	implementation 'org.springframework.boot:spring-boot-starter-validation'
+  	runtimeOnly 'org.hibernate.validator:hibernate-validator'
+	// ページネーション
+  	implementation 'org.springframework.data:spring-data-commons'
+	// Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+	// WebSocket の依存関係
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// JPA の依存関係
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+

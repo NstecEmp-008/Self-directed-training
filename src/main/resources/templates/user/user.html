@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>ユーザーホーム</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .menu a,
+    .menu button {
+      display: inline-block;
+      padding: 12px 25px;
+      font-size: 1em;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s;
+      width: 60%;
+      text-align: center;
+    }
+
+    .menu a {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .menu a:hover {
+      background-color: #0056b3;
+    }
+
+    .menu .secondary {
+      background-color: #6c757d;
+      color: #fff;
+    }
+
+    .menu .secondary:hover {
+      background-color: #565e64;
+    }
+
+    .menu button {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .menu button:hover {
+      background-color: #b02a37;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>ようこそ、ユーザーさん！</h1>
+    <p>このページでは、ユーザー向けの機能をご利用いただけます。</p>
+
+    <div class="menu">
+      <a th:href="@{/user/stocks}">📈 銘柄一覧へ</a>
+      <a th:href="@{/user/stock/portfolio}" class="secondary">📊 保有株一覧</a>
+      <a th:href="@{/user/portfolio}">💼 マイポートフォリオ</a>
+
+      <form th:action="@{/logout}" method="post" style="width: 100%;">
+        <button type="submit">🚪 ログアウト</button>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

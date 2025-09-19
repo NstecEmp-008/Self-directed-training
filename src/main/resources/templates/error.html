@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>アクセスが拒否されました</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        h1 {
+            color: #d9534f;
+        }
+        a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>アクセスが拒否されました</h1>
+        <p>このページにアクセスする権限がありません。</p>
+        <p>もしログインが必要な場合は、<a th:href="@{/admin/login}">ログインページ</a>からログインしてください。</p>
+        <a href="/home">ホームに戻る</a>
+    </div>
+</body>
+</html>

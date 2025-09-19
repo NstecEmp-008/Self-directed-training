@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>管理者画面 - 銘柄管理</title>
+    <!-- Bootstrap 読み込み -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 1.6rem;
+            color: #003366;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .add-stock-btn {
+            background: #0d6efd;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-right: 10px;
+            transition: background 0.2s;
+        }
+        .add-stock-btn:hover {
+            background: #004080;
+        }
+        .search-form input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-right: 5px;
+        }
+        .search-form button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #198754;
+            color: white;
+            transition: background 0.2s;
+        }
+        .search-form button:hover {
+            background: #145c32;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #003366;
+            color: white;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        tbody tr:hover {
+            background-color: #f1f5fb;
+        }
+        .action-link {
+            margin: 0 6px;
+            text-decoration: none;
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        .action-link.delete {
+            color: #dc3545;
+        }
+        .action-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>管理者画面 - 銘柄管理</h1>
+
+        <div class="action-bar">
+            <div>
+                <a th:href="@{/admin/stocks/register}" class="add-stock-btn">＋ 新規銘柄登録</a>
+                <a th:href="@{/admin/menu}" class="add-stock-btn" style="background:#6c757d;">← メニューへ戻る</a>
+            </div>
+            <form th:action="@{/admin/stocks}" method="get" class="search-form d-flex">
+                <input type="text" name="searchTerm" placeholder="銘柄コードまたは銘柄名で検索" th:value="${param.searchTerm}">
+                <button type="submit">検索</button>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>銘柄コード</th>
+                    <th>銘柄名</th>
+                    <th>現在価格</th>
+                    <th>前日比（%）</th>
+                    <th>最終更新日時</th>
+                    <th class="text-center">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="stock : ${stocks}">
+                    <td th:text="${stock.id}">1</td>
+                    <td th:text="${stock.symbol}">AAPL</td>
+                    <td th:text="${stock.name}">Apple Inc.</td>
+                    <td th:text="${#numbers.formatDecimal(stock.price, 0, 'POINT', 2, 'COMMA')}">150.00</td>
+                    <td th:text="${#numbers.formatDecimal(stock.changePercentage, 0, 'POINT', 2, 'COMMA')}">1.50</td>
+                    <td th:text="${#temporals.format(stock.lastUpdated, 'yyyy/MM/dd HH:mm:ss')}">2023/10/26 10:00:00</td>
+                    <td class="text-center">
+                        <a th:href="@{/admin/stocks/edit/{id}(id=${stock.id})}" class="action-link">編集</a>
+                        <a th:href="@{/admin/stocks/delete/{id}(id=${stock.id})}" class="action-link delete"
+                           onclick="return confirm('本当に削除しますか？');">削除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>マイポートフォリオ</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin: 10px 0 20px 0;
+      padding: 8px 15px;
+      background: #6c757d;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #565e64;
+    }
+
+    /* サマリーカード */
+    .summary-cards {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      flex: 1;
+      min-width: 200px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .card h2 {
+      font-size: 1.1em;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .card p {
+      font-size: 1.6em;
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    /* グラフカード */
+    .charts {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .chart-box {
+      flex: 1;
+      min-width: 320px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>マイポートフォリオ</h1>
+
+  <div style="text-align:center;">
+    <a th:href="@{/user/user}" class="back-btn">← ユーザーページに戻る</a>
+  </div>
+
+  <!-- サマリーカード -->
+  <div class="summary-cards">
+    <div class="card">
+      <h2>総資産額</h2>
+      <p id="totalAsset" th:text="${totalAssets} + ' 円'">--- 円</p>
+    </div>
+    <div class="card">
+      <h2>現金残高</h2>
+      <p id="cashBalance">---</p>
+    </div>
+    <div class="card">
+      <h2>株式評価額</h2>
+      <p id="stockValue">---</p>
+    </div>
+  </div>
+
+  <!-- グラフ表示 -->
+  <div class="charts">
+    <div class="chart-box">
+      <h2>資産推移</h2>
+      <canvas id="assetChart" height="120"></canvas>
+    </div>
+    <div class="chart-box">
+      <h2>資産内訳</h2>
+      <canvas id="pieChart" width="300" height="300"></canvas>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    const userId = /*[[${userId}]]*/ 0;
+    let totalAsset = /*[[${totalAssets}]]*/ 0;
+
+    // 折れ線グラフ
+    const ctx = document.getElementById('assetChart').getContext('2d');
+    const assetChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [new Date().toLocaleTimeString("ja-JP")],
+        datasets: [{
+          label: '総資産額 (円)',
+          data: [totalAsset],
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0,123,255,0.2)',
+          borderWidth: 2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { title: { display: true, text: '円' } },
+          x: { title: { display: true, text: '時刻' } }
+        }
+      }
+    });
+
+    // 円グラフ
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(ctxPie, {
+      type: 'pie',
+      data: {
+        labels: ['現金残高', '株式評価額'],
+        datasets: [{
+          data: [0, 0],
+          backgroundColor: ['#007bff', '#28a745']
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+
+    // WebSocket 接続
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+      stompClient.subscribe('/topic/portfolio/assets/' + userId, function (message) {
+        const data = JSON.parse(message.body);
+
+        document.getElementById("totalAsset").textContent = data.totalAssets.toLocaleString() + " 円";
+        document.getElementById("cashBalance").textContent = data.cashBalance.toLocaleString();
+        document.getElementById("stockValue").textContent = data.stockValue.toLocaleString();
+
+        const now = new Date().toLocaleTimeString("ja-JP");
+        assetChart.data.labels.push(now);
+        assetChart.data.datasets[0].data.push(data.totalAssets);
+        if (assetChart.data.labels.length > 10) {
+          assetChart.data.labels.shift();
+          assetChart.data.datasets[0].data.shift();
+        }
+        assetChart.update();
+
+        pieChart.data.datasets[0].data = [data.cashBalance, data.stockValue];
+        pieChart.update();
+      });
+    });
+  </script>
+</body>
+
+</html>

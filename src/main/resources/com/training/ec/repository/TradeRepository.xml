@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.training.ec.repository.TradeRepository">
+    <!-- 結果マッピング（UUID用にTypeHandlerを指定） -->
+    <resultMap id="TradeHistoryResultMap" type="com.training.ec.entity.TradeHistory">
+        <id property="id" column="id" />
+        <result property="userId" column="userId" />
+        <result property="stockId" column="stockId" />
+        <result property="quantity" column="quantity" />
+        <result property="totalPrice" column="totalPrice" />
+        <result property="tradeType" column="tradeType" />
+        <result property="tradeTime" column="tradeTime" />
+        <!-- UUID型はTypeHandlerを指定 -->
+        <result property="requestId" column="requestId"
+            jdbcType="OTHER"
+            typeHandler="com.training.ec.helper.UUIDTypeHandler" />
+    </resultMap>
+
+    <!-- 🎤 ユーザー残高管理 -->
+    <select id="findWalletByUserId" resultType="com.training.ec.entity.Wallet"> 
+        SELECT 
+         user_id AS userId, 
+         balance 
+        FROM
+         wallet 
+        WHERE 
+         user_id = #{userId} 
+    </select>
+
+    <update id="updateWallet" parameterType="com.training.ec.entity.Wallet"> 
+        UPDATE 
+         wallet 
+        SET
+         balance = #{balance} 
+        WHERE 
+         user_id = #{userId} 
+    </update>
+
+    <!-- 株式情報を取得 -->
+    <select id="findStockById" resultType="com.training.ec.entity.Stock"> 
+        SELECT 
+         id, 
+         symbol,
+         name,
+         price,
+         change_percentage AS changePercentage, 
+         last_updated AS lastUpdated, 
+         quantity 
+        FROM
+         stock WHERE id = #{id} 
+    </select>
+
+    <update id="updateStockQuantity" parameterType="com.training.ec.entity.Stock"> 
+        UPDATE 
+         stock
+        SET
+         quantity = #{quantity} 
+        WHERE id = #{id} 
+    </update>
+
+    <!-- 🎤 ユーザー保有株 （修正あり）-->
+    <select id="findUserStock" resultType="com.training.ec.entity.UserStock"> 
+    SELECT 
+        us.id,
+        us.user_id AS userId,
+        us.stock_id AS stockId,
+        us.quantity,
+        s.symbol,
+        s.name,
+        s.price,
+        s.last_updated AS lastUpdated
+    FROM user_stock us
+    JOIN stock s ON us.stock_id = s.id
+    WHERE us.user_id = #{userId} 
+      AND us.stock_id = #{stockId}
+    </select>
+
+
+
+    <insert id="insertUserStock" parameterType="com.training.ec.entity.UserStock" useGeneratedKeys="true" keyProperty="id"> 
+        INSERT INTO 
+         user_stock (user_id, stock_id, quantity) 
+        VALUES 
+         (#{userId}, #{stockId}, #{quantity}) 
+        </insert>
+
+    <!-- 🎤 取引履歴 -->
+    <insert id="insertTradeHistory" parameterType="com.training.ec.entity.TradeHistory" useGeneratedKeys="true" keyProperty="id"> 
+        INSERT INTO 
+         trade_history (user_id, stock_id, quantity, total_price, trade_type, trade_time, request_id) 
+        VALUES 
+         (#{userId}, #{stockId}, #{quantity}, #{totalPrice}, #{tradeType}, #{tradeTime}, #{requestId, jdbcType=OTHER,
+        typeHandler=com.training.ec.helper.UUIDTypeHandler}) 
+    </insert>
+
+
+    <!-- ユーザーIDで取引履歴を取得 -->
+    <select id="findTradeHistoryByUserId" resultMap="TradeHistoryResultMap"> 
+        SELECT 
+         id, 
+         user_id AS userId, 
+         stock_id AS stockId, 
+         quantity, 
+         total_price AS totalPrice, 
+         trade_type AS tradeType,
+         trade_time AS tradeTime, 
+         request_id AS requestId 
+        FROM 
+         trade_history 
+        WHERE 
+         user_id = #{userId} 
+        ORDER BY 
+         trade_time 
+        DESC 
+    </select>
+
+
+
+    <delete id="deleteUserStock">
+    DELETE FROM user_stock
+    WHERE user_id = #{userId} AND stock_id = #{stockId}
+    </delete>
+    
+    <update id="updateUserStock" parameterType="com.training.ec.entity.UserStock">
+    UPDATE user_stock
+    SET quantity = #{quantity}
+    WHERE user_id = #{userId}
+      AND stock_id = #{stockId}
+</update>
+
+
+
+</mapper>

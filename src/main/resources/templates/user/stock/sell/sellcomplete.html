@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>売却完了</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center space-y-6">
+    <!-- タイトル -->
+    <h2 class="text-3xl font-extrabold text-green-600">売却完了</h2>
+
+    <!-- メッセージ -->
+    <p class="text-gray-700 text-lg" th:text="${message}">
+      売却が正常に処理されました。
+    </p>
+
+    <!-- 戻るリンク -->
+    <div class="space-y-3 pt-6">
+      <a th:href="@{/user/stock/portfolio}"
+         class="block w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow-md hover:bg-green-700 transition">
+        保有一覧に戻る
+      </a>
+      <a th:href="@{/user/stocks}"
+         class="block w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-bold shadow-md hover:bg-gray-300 transition">
+        銘柄一覧に戻る
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

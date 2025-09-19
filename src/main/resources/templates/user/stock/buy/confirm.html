@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>購入確認</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full space-y-6">
+    
+    <!-- タイトル -->
+    <h2 class="text-2xl font-bold text-gray-800 text-center">購入確認</h2>
+    <p class="text-gray-600 text-center">以下の内容で購入します。よろしいですか？</p>
+
+    <!-- 確認内容 -->
+    <div class="space-y-2 text-gray-700">
+      <p><strong>銘柄コード:</strong> <span th:text="${stock.symbol}"></span></p>
+      <p><strong>銘柄名:</strong> <span th:text="${stock.name}"></span></p>
+      <p><strong>現在価格:</strong> <span th:text="${stock.price}"></span> 円</p>
+      <p><strong>購入数量:</strong> <span th:text="${buyForm.quantity}"></span> 株</p>
+      <p class="text-lg font-bold text-blue-600">
+        <strong>合計金額:</strong> <span th:text="${totalPrice}"></span> 円
+      </p>
+    </div>
+
+    <!-- 購入実行フォーム -->
+    <form th:action="@{/user/stock/buy/execute}" th:object="${buyForm}" method="post" class="space-y-4">
+      <input type="hidden" th:field="*{stockId}" />
+      <input type="hidden" th:field="*{quantity}" />
+      <input type="hidden" name="buyToken" th:value="${buyToken}" />
+
+      <button type="submit" id="executeBtn"
+        class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow-md hover:bg-green-700 transition">
+        購入する
+      </button>
+    </form>
+
+    <!-- 戻るボタン -->
+    <form th:action="@{/user/stock/buy/{id}(id=${buyForm.stockId})}" method="get">
+      <button type="submit"
+        class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-bold shadow-md hover:bg-gray-300 transition">
+        戻る
+      </button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.querySelector("form[th\\:action='@{/user/stock/buy/execute}']");
+    const btn  = document.getElementById("executeBtn");
+    form.addEventListener("submit", () => {
+        btn.disabled = true;
+        btn.textContent = "処理中…";
+    });
+  </script>
+
+</body>
+</html>

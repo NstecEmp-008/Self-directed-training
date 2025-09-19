@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <style>
+    div#header {
+      background-color: white;
+      height: 100px;
+    }
+    div#footer {
+      background-color: white;
+      clear: left;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+  <body>
+    <!-- ヘッダー部分 -->
+    <div
+      th:fragment="header"
+      id="header"
+      style="text-align: center; border-bottom: 2px solid green"
+    >
+      <h1 style="color: green"> 管理画面</h1>
+      <a href="/admin/product" style="color: green">商品情報メンテナンス</a>
+      <a href="/admin/product-category-add" style="color: green">商品カテゴリ登録</a>
+      <a href="/admin/account/form" style="color: green">アカウント登録</a>
+       <form th:action="@{/logout}" method="post">
+        <button type="submit">ログアウト</button>
+       </form>
+    </div>
+    <!-- フッター部分 -->
+    <div
+      th:fragment="footer"
+      id="footer"
+      ;
+      style="text-align: center; border-top: 2px solid green"
+    >
+      <p style="color: green">Fullness Stationery</p>
+    </div>
+  </body>
+</html>

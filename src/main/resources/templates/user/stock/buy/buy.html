@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>株購入フォーム</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl space-y-6">
+    
+    <!-- グラフエリア -->
+    <h2 class="text-xl font-bold text-gray-800" th:text="${stock.name} + ' の価格推移'"></h2>
+    <div class="bg-gray-50 p-4 rounded-lg shadow-inner">
+      <canvas id="stockChart"></canvas>
+    </div>
+
+    <!-- 株購入フォーム -->
+    <h2 class="text-xl font-bold text-gray-800">株購入フォーム</h2>
+
+    <form th:action="@{/user/stock/buy/confirm}" th:object="${buyForm}" method="post" class="space-y-4">
+      
+      <!-- 銘柄情報 -->
+      <div class="bg-blue-50 p-4 rounded-lg text-gray-700">
+        <p><strong>銘柄コード:</strong> <span th:text="${stock.symbol}"></span></p>
+        <p><strong>銘柄名:</strong> <span th:text="${stock.name}"></span></p>
+        <p>
+          <strong>現在価格:</strong> 
+          <span id="currentPrice" th:text="${stock.price}" class="text-blue-600 font-bold"></span> 円
+        </p>
+      </div>
+
+      <!-- hidden -->
+      <input type="hidden" th:field="*{stockId}" th:value="${stock.id}" />
+
+      <!-- 購入数量入力 -->
+      <div>
+        <label for="quantity" class="block font-semibold text-gray-700">購入数:</label>
+        <input type="number" th:field="*{quantity}" min="1" required
+               class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+        <span th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" class="text-red-500 text-sm"></span>
+      </div>
+
+      <!-- ボタン -->
+      <div class="pt-4 flex justify-end">
+        <button type="submit" 
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
+          確認画面へ
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+  <script>
+    // stockId の取得
+    const stockId = document.querySelector('input[name="stockId"]').value;
+
+    // Chart.js 初期化
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    const stockChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: '価格 (円)',
+          data: [],
+          borderColor: '#2563eb',
+          borderWidth: 2,
+          fill: false,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { title: { display: true, text: '円' } },
+          x: { title: { display: true, text: '時刻' } }
+        }
+      }
+    });
+
+    // WebSocket 接続
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+      console.log("✅ WebSocket 接続成功");
+
+      stompClient.subscribe('/topic/stock/' + stockId, function (message) {
+        const stock = JSON.parse(message.body);
+
+        const now = new Date().toLocaleTimeString("ja-JP", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+
+        // グラフ更新
+        stockChart.data.labels.push(now);
+        stockChart.data.datasets[0].data.push(stock.price);
+
+        if (stockChart.data.labels.length > 10) {
+          stockChart.data.labels.shift();
+          stockChart.data.datasets[0].data.shift();
+        }
+
+        stockChart.update();
+
+        // 現在価格テキストも更新
+        document.getElementById("currentPrice").textContent = stock.price.toFixed(2);
+      });
+    });
+  </script>
+</body>
+</html>

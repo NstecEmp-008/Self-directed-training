@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.ec.repository.WalletRepository">
+
+    <!-- 💰 現金残高 -->
+    <select id="findCashBalanceByUserId" parameterType="int" resultType="java.math.BigDecimal">
+        SELECT balance
+        FROM wallet
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 📊 総資産（現金＋株式評価額） -->
+    <select id="getTotalAssets" parameterType="int" resultType="java.math.BigDecimal">
+        SELECT 
+            w.balance + COALESCE(SUM(us.quantity * s.price), 0) AS total_assets
+        FROM wallet w
+        LEFT JOIN user_stock us ON w.user_id = us.user_id
+        LEFT JOIN stock s ON us.stock_id = s.id
+        WHERE w.user_id = #{userId}
+        GROUP BY w.balance
+    </select>
+
+
+    <select id="getBalance" parameterType="int" resultType="java.math.BigDecimal">
+    SELECT balance
+    FROM wallet
+    WHERE user_id = #{userId}
+    </select>
+
+    <select id="findAllUserIds" resultType="int">
+    SELECT user_id FROM wallet
+    </select>
+
+     <insert id="insertWallet" parameterType="com.training.ec.entity.Wallet">
+        INSERT INTO wallet (user_id, balance)
+        VALUES (#{userId}, #{balance})
+    </insert>
+
+
+</mapper>

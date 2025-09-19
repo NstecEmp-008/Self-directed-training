@@ -1,0 +1,94 @@
+/*
+ * スタイルシート：管理者画面 - 銘柄一覧
+ * 管理者画面のレイアウト、フォーム、テーブルのスタイルを定義します。
+ */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+.container {
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h1, h2 {
+    color: #333;
+}
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+.action-bar {
+    /* すべての要素を横並びに配置するためのFlexboxコンテナ */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* 画面幅が狭い場合に折り返す */
+    margin-bottom: 20px;
+    gap: 10px; /* ボタンと検索フォームの間のスペース */
+}
+.add-stock-btn {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+}
+.add-stock-btn:hover {
+    background-color: #218838;
+}
+.search-form {
+    display: flex;
+    gap: 10px;
+}
+.search-form input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    /* テキストボックスの幅を広く設定 */
+    width: 400px;
+}
+.search-form button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.search-form button:hover {
+    background-color: #0056b3;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+.price-up {
+    color: #28a745;
+    font-weight: bold;
+}
+.price-down {
+    color: #dc3545;
+    font-weight: bold;
+}
+.action-links a {
+    margin-right: 10px;
+}

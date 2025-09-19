@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>保有株一覧</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>保有株一覧</h1>
+
+        <!-- メニューや株一覧へのリンク -->
+        <div class="action-bar">
+            <a th:href="@{/user/user}" class="add-stock-btn">メニューへ戻る</a>
+            <a th:href="@{/user/stocks}" class="add-stock-btn">株一覧へ戻る</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <!-- <th>ID</th> -->
+                    <th>銘柄コード</th>
+                    <th>銘柄名</th>
+                    <th>現在価格</th>
+                    <th>保有株数</th>
+                    <th>前日比</th>
+                    <th>最終更新日時</th>
+                    <th class="text-center">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- UserStock のリストを表示 -->
+                <tr th:each="userStock : ${userStocks}" th:id="'stock-' + ${userStock.stockId}">
+                    <!-- <td th:text="${userStock.id}">1</td> -->
+                    <td th:text="${userStock.symbol}">AAPL</td>
+                    <td th:text="${userStock.name}">Apple Inc.</td>
+                    <td class="price" th:text="${#numbers.formatDecimal(userStock.price, 0, 'POINT', 2, 'COMMA')}">
+                        150.00</td>
+                    <td th:text="${userStock.quantity}">10</td>
+
+                    <td class="change">0.0%</td>
+                    <td class="lastUpdated"
+                        th:text="${#temporals.format(userStock.lastUpdated, 'yyyy/MM/dd HH:mm:ss')}">2023/10/26 10:00:00
+                    </td>
+                    <td class="text-center">
+                        <!-- 売却ページに遷移 -->
+                        <a th:href="@{/user/stock/sell/{stockId}(stockId=${userStock.stockId})}"
+                            class="action-link">売却</a>
+
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- SockJS / STOMP ライブラリ -->
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+        <script>
+            // ✅ サーバー側のエンドポイントに接続（SockJS 経由）
+            const socket = new SockJS('/ws');
+            const stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function () {
+                console.log("✅ WebSocket 接続成功");
+
+                // ✅ サーバー側が送信する /topic/stocks を購読
+                stompClient.subscribe('/topic/stocks', function (message) {
+                    const stocks = JSON.parse(message.body);
+
+                    // 配列として送られてくる想定
+                    stocks.forEach(stock => {
+                        const row = document.querySelector("#stock-" + stock.id);
+                        if (row) {
+                            // 現在価格を更新
+                            row.querySelector(".price").textContent = stock.price.toFixed(2);
+
+                            // 変動率を更新
+                            row.querySelector(".change").textContent = stock.changePercentage.toFixed(2) + "%";
+
+                            // ✅ 更新日時を「現在時刻」で表示
+                            const now = new Date();
+                            row.querySelector(".lastUpdated").textContent =
+                                now.toLocaleString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+                        }
+                    });
+                });
+            });
+        </script>
+
+    </div>
+</body>
+
+</html>

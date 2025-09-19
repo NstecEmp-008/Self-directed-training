@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.training.ec.repository.UserRepository">
+    <!-- Accountエンティティに結果をマッピングする設計図 -->
+    <resultMap id="accountResultMap" type="com.training.ec.entity.Account">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="password"/>
+        <!-- roleプロパティ（AccountRole型）へのマッピング -->
+        <association property="role" javaType="com.training.ec.entity.AccountRole">
+            <id property="roleId" column="role_id"/>
+            <result property="roleName" column="role_name"/>
+        </association>
+    </resultMap>
+
+    <!-- アカウント登録 -->
+    <insert id="insertAccount"
+        parameterType="com.training.ec.entity.Account"
+        useGeneratedKeys="true"
+        keyProperty="userId">
+    INSERT INTO account (user_name, password, role_id)
+    VALUES (#{userName}, #{password}, #{role.roleId})
+    </insert>
+
+
+    <!-- ユーザー名でアカウントを取得（resultMapを使用！） -->
+    <select id="selectByUserName" resultMap="accountResultMap">
+        SELECT
+            a.user_id ,
+            a.user_name,
+            a.password,
+            r.role_id,
+            r.role_name
+        FROM
+            account a
+        LEFT JOIN
+            account_role r
+        ON
+            a.role_id = r.role_id
+        WHERE
+            a.user_name = #{userName}
+    </select>
+
+    <!-- ロール名でロール情報を取得 -->
+    <select id="selectRoleByName" resultType="com.training.ec.entity.AccountRole">
+        SELECT
+            role_id as roleId,
+            role_name as roleName
+        FROM
+            account_role
+        WHERE
+            role_name = #{roleName}
+    </select>
+
+    <!-- <select id="selectRoleByName2" resultType="com.training.ec.entity.AccountRole">
+        SELECT
+            role_id as roleId,
+            role_name as roleName
+        FROM
+            account_role
+        WHERE
+            role_name = 'ROLE_USER'
+    </select> -->
+    
+    <!-- ロールIDでロール情報を取得 -->
+    <select id="findById" resultType="com.training.ec.entity.AccountRole">
+        SELECT
+            role_id as roleId,
+            role_name as roleName
+        FROM
+            account_role
+        WHERE
+            role_id = #{roleId}
+    </select>
+
+    <!-- ユーザーのロールを更新 -->
+    <update id="updateUserRole" parameterType="java.util.Map">
+        UPDATE account
+        SET
+            role_id = #{roleId}
+        WHERE
+            user_id = #{userId}
+    </update>
+
+    
+
+</mapper>
