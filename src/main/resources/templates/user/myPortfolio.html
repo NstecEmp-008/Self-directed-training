@@ -103,11 +103,11 @@
     </div>
     <div class="card">
       <h2>現金残高</h2>
-      <p id="cashBalance">---</p>
+      <p id="cashBalance">--- 円</p>
     </div>
     <div class="card">
       <h2>株式評価額</h2>
-      <p id="stockValue">---</p>
+      <p id="stockValue">--- 円</p>
     </div>
   </div>
 
@@ -145,8 +145,29 @@
       options: {
         responsive: true,
         scales: {
-          y: { title: { display: true, text: '円' } },
-          x: { title: { display: true, text: '時刻' } }
+          y: {
+            title: {
+              display: true,
+              text: '円'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: '時刻'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                let label = context.dataset.label || '';
+                let value = context.formattedValue;
+                return label + ': ' + value + ' 円';
+              }
+            }
+          }
         }
       }
     });
@@ -156,7 +177,7 @@
     const pieChart = new Chart(ctxPie, {
       type: 'pie',
       data: {
-        labels: ['現金残高', '株式評価額'],
+        labels: ['現金残高(円)', '株式評価額(円)'],
         datasets: [{
           data: [0, 0],
           backgroundColor: ['#007bff', '#28a745']
@@ -164,7 +185,17 @@
       },
       options: {
         plugins: {
-          legend: { position: 'bottom' }
+          legend: { position: 'bottom' },
+          // ツールチップの追加
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                let label = context.label || '';
+                let value = context.raw || 0;
+                return label + ': ' + value.toLocaleString() + ' 円';
+              }
+            }
+          }
         }
       }
     });
@@ -178,8 +209,8 @@
         const data = JSON.parse(message.body);
 
         document.getElementById("totalAsset").textContent = data.totalAssets.toLocaleString() + " 円";
-        document.getElementById("cashBalance").textContent = data.cashBalance.toLocaleString();
-        document.getElementById("stockValue").textContent = data.stockValue.toLocaleString();
+        document.getElementById("cashBalance").textContent = data.cashBalance.toLocaleString() + " 円";
+        document.getElementById("stockValue").textContent = data.stockValue.toLocaleString() + " 円";
 
         const now = new Date().toLocaleTimeString("ja-JP");
         assetChart.data.labels.push(now);

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>新規銘柄登録</title>
@@ -10,28 +11,49 @@
             background-color: #f5f7fa;
             font-family: 'Noto Sans JP', sans-serif;
         }
+
         .card-header {
             background-color: #003366;
         }
+
         .btn-primary {
             background-color: #0d6efd;
             border-color: #0d6efd;
         }
+
         .btn-outline-secondary {
             border-color: #6c757d;
             color: #6c757d;
         }
+
         .form-label {
             font-weight: 600;
         }
+
         .error {
             color: red;
             font-size: 0.875em;
         }
     </style>
 </head>
+
 <body>
     <div class="container mt-5">
+
+        <!-- ✅ エラーメッセージ表示エリア -->
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <!-- ✕ ボタン -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- 成功メッセージ表示エリア -->
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <span th:text="${successMessage}"></span>
+            <!-- ✕ ボタン -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
         <div class="card shadow">
             <div class="card-header text-white text-center">
                 <h3 class="mb-0">新規銘柄登録</h3>
@@ -44,7 +66,8 @@
                     <div class="mb-3">
                         <label for="symbol" class="form-label">銘柄コード</label>
                         <input type="text" id="symbol" class="form-control" th:field="*{symbol}" placeholder="例: 7203">
-                        <div class="text-danger small" th:if="${#fields.hasErrors('symbol')}" th:errors="*{symbol}"></div>
+                        <div class="text-danger small" th:if="${#fields.hasErrors('symbol')}" th:errors="*{symbol}">
+                        </div>
                     </div>
 
                     <!-- 銘柄名 -->
@@ -59,7 +82,8 @@
                         <label for="price" class="form-label">初期価格</label>
                         <div class="input-group">
                             <span class="input-group-text">¥</span>
-                            <input type="number" step="0.01" id="price" class="form-control" th:field="*{price}" placeholder="1000.00">
+                            <input type="number" step="0.01" id="price" class="form-control" th:field="*{price}"
+                                placeholder="1000.00">
                         </div>
                         <div class="text-danger small" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
                     </div>
@@ -75,7 +99,8 @@
                             <option value="エネルギー">エネルギー</option>
                             <option value="その他">その他</option>
                         </select>
-                        <div class="text-danger small" th:if="${#fields.hasErrors('industry')}" th:errors="*{industry}"></div>
+                        <div class="text-danger small" th:if="${#fields.hasErrors('industry')}" th:errors="*{industry}">
+                        </div>
                     </div>
 
                     <!-- ボタン -->
@@ -88,4 +113,5 @@
         </div>
     </div>
 </body>
+
 </html>
