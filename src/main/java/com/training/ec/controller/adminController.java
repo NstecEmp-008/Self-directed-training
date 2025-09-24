@@ -142,7 +142,8 @@ public class adminController {
             redirectAttributes.addFlashAttribute("errorMessage", "登録内容に不備があります。再度入力してください。");
             return "redirect:/admin/stocks/register";
         }
-
+        // この部分が反応していない可能性がある　ここを修正。
+    
         try {
             stockService.createStock(stockForm);
             redirectAttributes.addFlashAttribute("successMessage", "新しい銘柄が正常に登録されました。");
