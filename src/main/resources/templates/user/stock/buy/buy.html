@@ -10,7 +10,7 @@
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
   <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl space-y-6">
-    
+
     <!-- グラフエリア -->
     <h2 class="text-xl font-bold text-gray-800" th:text="${stock.name} + ' の価格推移'"></h2>
     <div class="bg-gray-50 p-4 rounded-lg shadow-inner">
@@ -21,13 +21,13 @@
     <h2 class="text-xl font-bold text-gray-800">株購入フォーム</h2>
 
     <form th:action="@{/user/stock/buy/confirm}" th:object="${buyForm}" method="post" class="space-y-4">
-      
+
       <!-- 銘柄情報 -->
       <div class="bg-blue-50 p-4 rounded-lg text-gray-700">
         <p><strong>銘柄コード:</strong> <span th:text="${stock.symbol}"></span></p>
         <p><strong>銘柄名:</strong> <span th:text="${stock.name}"></span></p>
         <p>
-          <strong>現在価格:</strong> 
+          <strong>現在価格:</strong>
           <span id="currentPrice" th:text="${stock.price}" class="text-blue-600 font-bold"></span> 円
         </p>
       </div>
@@ -39,17 +39,25 @@
       <div>
         <label for="quantity" class="block font-semibold text-gray-700">購入数:</label>
         <input type="number" th:field="*{quantity}" min="1" required
-               class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+          class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" />
         <span th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" class="text-red-500 text-sm"></span>
       </div>
 
       <!-- ボタン -->
       <div class="pt-4 flex justify-end">
-        <button type="submit" 
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
+        <button type="submit"
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
           確認画面へ
         </button>
       </div>
+      <!-- ボタン -->
+      <div class="pt-4 flex justify-start">
+        <a th:href="@{/user/stocks}" 
+          class="bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-600 transition inline-block">
+          戻る
+        </a>
+      </div>
+
     </form>
   </div>
 
@@ -122,4 +130,5 @@
     });
   </script>
 </body>
+
 </html>
