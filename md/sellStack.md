@@ -1,5 +1,4 @@
 ```mermaid
-
 flowchart TB
 
 A["ユーザーが銘柄一覧画面から『売却』ボタンをクリック"] --> B["SellController が GET /sell を受け取る"]
